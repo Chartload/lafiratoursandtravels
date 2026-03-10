@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { 
   ContactContainer, 
@@ -8,9 +8,13 @@ import {
   InfoItem,
   FormGroup,
   SubmitButton,
-  PhoneNumbers
+  PhoneNumbers,
+  SuccessMessage,
+  ErrorMessage,
+  ContactHeading,
+  ContactSubHeading
 } from './ContactElements';
-import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaPaperPlane } from 'react-icons/fa';
+import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaPaperPlane, FaWhatsapp } from 'react-icons/fa';
 import emailjs from '@emailjs/browser';
 
 const Contact = () => {
@@ -22,11 +26,29 @@ const Contact = () => {
   const form = useRef();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
-  
+  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+  const [formData, setFormData] = useState({
+    user_name: '',
+    user_email: '',
+    user_phone: '',
+    message: ''
+  });
+
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const sendEmail = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
+    // EmailJS configuration
+    // Note: Replace these with your actual EmailJS credentials
     emailjs.sendForm(
       'YOUR_SERVICE_ID', 
       'YOUR_TEMPLATE_ID', 
@@ -34,43 +56,84 @@ const Contact = () => {
       'YOUR_PUBLIC_KEY'
     )
     .then((result) => {
-      setSubmitMessage('Message sent successfully! We will get back to you soon.');
+      setSubmitMessage('Message sent successfully! We will get back to you within 24 hours.');
+      setMessageType('success');
       form.current.reset();
+      setFormData({
+        user_name: '',
+        user_email: '',
+        user_phone: '',
+        message: ''
+      });
       setIsSubmitting(false);
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => {
+        setSubmitMessage('');
+      }, 5000);
     })
     .catch((error) => {
-      setSubmitMessage('Sorry, there was an error sending your message. Please try again.');
+      setSubmitMessage('Sorry, there was an error sending your message. Please try again or contact us directly via phone.');
+      setMessageType('error');
       setIsSubmitting(false);
+      
+      // Clear error message after 5 seconds
+      setTimeout(() => {
+        setSubmitMessage('');
+      }, 5000);
     });
+  };
+
+  // Handle WhatsApp click
+  const handleWhatsAppClick = () => {
+    window.open('https://wa.me/254729228859?text=Hello%20Lafira%20Tours,%20I%27m%20interested%20in%20your%20services.', '_blank');
+  };
+
+  // Handle phone call
+  const handlePhoneCall = (number) => {
+    window.location.href = `tel:${number}`;
   };
 
   return (
     <ContactContainer id="contact" ref={ref}>
       <div className="container">
         <div className="section-title">
-          <h2>Contact Us</h2>
+          <ContactHeading>Contact Us</ContactHeading>
+          <ContactSubHeading>We'd love to hear from you</ContactSubHeading>
         </div>
         
         <ContactContent>
           <ContactInfo inView={inView}>
             <h3>Get In Touch</h3>
-            <p>We're here to help you plan your next adventure. Reach out to us through any of these channels:</p>
+            <p className="info-description">
+              We're here to help you plan your next adventure. Reach out to us through any of these channels:
+            </p>
             
-            <InfoItem>
+            <InfoItem onClick={() => handlePhoneCall('0729228859')}>
               <FaPhone />
               <div>
-                <span>Phone Numbers:</span>
+                <span className="info-label">Phone Numbers:</span>
                 <PhoneNumbers>
-                  <strong>0729 228 859</strong>
-                  <strong>0704 100 229</strong>
+                  <strong className="clickable">0729 228 859</strong>
+                  <strong className="clickable">0704 100 229</strong>
                 </PhoneNumbers>
+                <small className="info-hint">Click to call</small>
+              </div>
+            </InfoItem>
+            
+            <InfoItem>
+              <FaWhatsapp className="whatsapp-icon" onClick={handleWhatsAppClick} />
+              <div>
+                <span className="info-label">WhatsApp:</span>
+                <strong className="clickable" onClick={handleWhatsAppClick}>0729 228 859</strong>
+                <small className="info-hint">Click to chat</small>
               </div>
             </InfoItem>
             
             <InfoItem>
               <FaEnvelope />
               <div>
-                <span>Email:</span>
+                <span className="info-label">Email:</span>
                 <strong>lafiratoursandtravels@gmail.com</strong>
               </div>
             </InfoItem>
@@ -78,10 +141,19 @@ const Contact = () => {
             <InfoItem>
               <FaMapMarkerAlt />
               <div>
-                <span>Address:</span>
+                <span className="info-label">Address:</span>
                 <strong>Nairobi, Kenya</strong>
+                <span className="address-detail">CBD Area, along Moi Avenue</span>
               </div>
             </InfoItem>
+
+            {/* Business Hours */}
+            <div className="business-hours">
+              <h4>Business Hours</h4>
+              <p>Monday - Friday: 8:00 AM - 8:00 PM</p>
+              <p>Saturday: 9:00 AM - 6:00 PM</p>
+              <p>Sunday: 10:00 AM - 4:00 PM</p>
+            </div>
           </ContactInfo>
           
           <ContactForm 
@@ -91,22 +163,63 @@ const Contact = () => {
             delay={0.2}
           >
             <h3>Send us a Message</h3>
+            <p className="form-description">Fill out the form below and we'll get back to you as soon as possible.</p>
+            
             <FormGroup>
-              <input type="text" name="user_name" placeholder="Your Name" required />
+              <input 
+                type="text" 
+                name="user_name" 
+                placeholder="Your Full Name *" 
+                value={formData.user_name}
+                onChange={handleInputChange}
+                required 
+              />
             </FormGroup>
+            
             <FormGroup>
-              <input type="email" name="user_email" placeholder="Your Email" required />
+              <input 
+                type="email" 
+                name="user_email" 
+                placeholder="Your Email Address *" 
+                value={formData.user_email}
+                onChange={handleInputChange}
+                required 
+              />
             </FormGroup>
+            
             <FormGroup>
-              <input type="tel" name="user_phone" placeholder="Your Phone" />
+              <input 
+                type="tel" 
+                name="user_phone" 
+                placeholder="Your Phone Number" 
+                value={formData.user_phone}
+                onChange={handleInputChange}
+              />
             </FormGroup>
+            
             <FormGroup>
-              <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+              <textarea 
+                name="message" 
+                placeholder="Your Message *" 
+                rows="5" 
+                value={formData.message}
+                onChange={handleInputChange}
+                required
+              ></textarea>
             </FormGroup>
+            
             <SubmitButton type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Sending...' : 'Send Message'} <FaPaperPlane />
+              {isSubmitting ? 'Sending...' : 'Send Message'} 
+              <FaPaperPlane className={isSubmitting ? 'sending' : ''} />
             </SubmitButton>
-            {submitMessage && <p>{submitMessage}</p>}
+            
+            {submitMessage && (
+              messageType === 'success' ? (
+                <SuccessMessage>{submitMessage}</SuccessMessage>
+              ) : (
+                <ErrorMessage>{submitMessage}</ErrorMessage>
+              )
+            )}
           </ContactForm>
         </ContactContent>
       </div>
