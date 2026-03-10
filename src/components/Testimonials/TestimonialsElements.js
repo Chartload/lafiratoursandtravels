@@ -1,6 +1,6 @@
 import styled, { keyframes } from 'styled-components';
 
-// Animations
+// Keep only animations that are actually used
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -12,28 +12,9 @@ const fadeIn = keyframes`
   }
 `;
 
-const slideIn = keyframes`
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-`;
-
-const pulse = keyframes`
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
-`;
+// Remove unused animations
+// const slideIn = keyframes`...`; // Removed - not used
+// const pulse = keyframes`...`;    // Removed - not used
 
 export const TestimonialsContainer = styled.section`
   background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
@@ -182,8 +163,8 @@ export const TestimonialSlide = styled.div`
   background: #fff;
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-  opacity: ${props => props.active ? 1 : 0};
-  transform: ${props => props.active ? 'translateY(0) scale(1)' : 'translateY(50px) scale(0.95)'};
+  opacity: ${props => (props.active ? 1 : 0)};
+  transform: ${props => (props.active ? 'translateY(0) scale(1)' : 'translateY(50px) scale(0.95)')};
   position: absolute;
   top: 0;
   left: 0;
@@ -193,7 +174,7 @@ export const TestimonialSlide = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: ${props => props.active ? 'all' : 'none'};
+  pointer-events: ${props => (props.active ? 'all' : 'none')};
   border: 1px solid rgba(0, 51, 102, 0.05);
   
   @media (max-width: 768px) {
@@ -220,7 +201,7 @@ export const TestimonialSlide = styled.div`
 export const TestimonialContent = styled.div`
   max-width: 600px;
   margin: 0 auto;
-  animation: ${props => props.active ? fadeIn : 'none'} 0.8s ease;
+  animation: ${props => (props.active ? fadeIn : 'none')} 0.8s ease;
   
   .quote-icon {
     font-size: 2.5rem;
@@ -497,7 +478,7 @@ export const SlideDot = styled.button`
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: ${props => props.active ? '#003366' : '#ccc'};
+  background: ${props => (props.active ? '#003366' : '#ccc')};
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;

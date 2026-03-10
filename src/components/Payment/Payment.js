@@ -17,7 +17,6 @@ import {
   FormRow,
   PaymentButton,
   CardPreview,
-  PreviewHeader,
   PreviewNumber,
   PreviewDetails,
   PreviewName,
@@ -32,11 +31,10 @@ import {
   LoadingSpinner
 } from './PaymentElements';
 import { FaCcVisa, FaCcMastercard, FaLock, FaArrowLeft, FaCheckCircle } from 'react-icons/fa';
-import { MdSecurity } from 'react-icons/md';
 
 const Payment = () => {
   const navigate = useNavigate();
-  const { service } = useParams();
+  const params = useParams(); // Fixed: using params instead of unused service
   const [selectedMethod, setSelectedMethod] = useState('visa');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -69,9 +67,8 @@ const Payment = () => {
       const numeric = value.replace(/[^0-9]/g, '').slice(0, 2);
       setFormData({ ...formData, [name]: numeric });
     } else if (name === 'cvv') {
-      // Only allow numbers, max 4 digits for Amex, 3 for others
-      const maxLength = selectedMethod === 'amex' ? 4 : 3;
-      const numeric = value.replace(/[^0-9]/g, '').slice(0, maxLength);
+      // Only allow numbers, max 3 digits
+      const numeric = value.replace(/[^0-9]/g, '').slice(0, 3);
       setFormData({ ...formData, [name]: numeric });
     } else {
       setFormData({ ...formData, [name]: value.toUpperCase() });
@@ -79,7 +76,8 @@ const Payment = () => {
   };
 
   const validateForm = () => {
-    if (formData.cardNumber.replace(/\s/g, '').length < 16) {
+    const cleanNumber = formData.cardNumber.replace(/\s/g, '');
+    if (cleanNumber.length < 16) {
       setError('Please enter a valid 16-digit card number');
       return false;
     }
@@ -119,19 +117,15 @@ const Payment = () => {
   };
 
   const formatCardNumber = (number) => {
+    if (!number) return '**** **** **** ****';
     const cleaned = number.replace(/\s/g, '');
-    const matches = cleaned.match(/\d{4,16}/g);
-    const match = matches && matches[0] || '';
     const parts = [];
     
-    for (let i = 0; i < match.length; i += 4) {
-      parts.push(match.substring(i, i + 4));
+    for (let i = 0; i < cleaned.length && i < 16; i += 4) {
+      parts.push(cleaned.substring(i, i + 4));
     }
     
-    if (parts.length) {
-      return parts.join(' ');
-    }
-    return '**** **** **** ****';
+    return parts.join(' ');
   };
 
   return (
@@ -174,7 +168,7 @@ const Payment = () => {
             {selectedMethod === 'visa' ? <FaCcVisa /> : <FaCcMastercard />}
           </CardBrands>
           <PreviewNumber>
-            {formData.cardNumber ? formatCardNumber(formData.cardNumber) : '**** **** **** ****'}
+            {formatCardNumber(formData.cardNumber)}
           </PreviewNumber>
           <PreviewDetails>
             <PreviewName>
@@ -246,7 +240,7 @@ const Payment = () => {
                 placeholder="CVV"
                 value={formData.cvv}
                 onChange={handleInputChange}
-                maxLength={selectedMethod === 'amex' ? '4' : '3'}
+                maxLength="3"
                 required
               />
             </FormRow>

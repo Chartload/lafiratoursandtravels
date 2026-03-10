@@ -1,17 +1,7 @@
+// src/components/Services/ServicesElements.js
 import styled, { keyframes } from 'styled-components';
 
-// Animations
-const fadeInUp = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
-
+// Keep only animations that are actually used
 const float = keyframes`
   0% {
     transform: translateY(0px);
@@ -241,7 +231,6 @@ export const ServiceBadge = styled.span`
   }
 `;
 
-// IMPORTANT: Define ServiceIcon BEFORE ServiceCard since ServiceCard references it
 export const ServiceIcon = styled.div`
   width: 80px;
   height: 80px;
@@ -292,7 +281,6 @@ export const ServiceIcon = styled.div`
   }
 `;
 
-// Define ServiceTitle and ServiceDescription BEFORE ServiceCard
 export const ServiceTitle = styled.h3`
   font-size: 1.5rem;
   margin-bottom: 12px;
@@ -351,7 +339,6 @@ export const ServiceDescription = styled.p`
   }
 `;
 
-// Now define ServiceCard (after all components it references)
 export const ServiceCard = styled.div`
   background: #ffffff;
   padding: 40px 25px;
