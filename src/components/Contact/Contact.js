@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { 
   ContactContainer, 
@@ -26,7 +26,7 @@ const Contact = () => {
   const form = useRef();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
-  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+  const [messageType, setMessageType] = useState('');
   const [formData, setFormData] = useState({
     user_name: '',
     user_email: '',
@@ -34,7 +34,6 @@ const Contact = () => {
     message: ''
   });
 
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -47,15 +46,13 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // EmailJS configuration
-    // Note: Replace these with your actual EmailJS credentials
     emailjs.sendForm(
       'YOUR_SERVICE_ID', 
       'YOUR_TEMPLATE_ID', 
       form.current, 
       'YOUR_PUBLIC_KEY'
     )
-    .then((result) => {
+    .then(() => {
       setSubmitMessage('Message sent successfully! We will get back to you within 24 hours.');
       setMessageType('success');
       form.current.reset();
@@ -67,29 +64,25 @@ const Contact = () => {
       });
       setIsSubmitting(false);
       
-      // Clear success message after 5 seconds
       setTimeout(() => {
         setSubmitMessage('');
       }, 5000);
     })
-    .catch((error) => {
+    .catch(() => {
       setSubmitMessage('Sorry, there was an error sending your message. Please try again or contact us directly via phone.');
       setMessageType('error');
       setIsSubmitting(false);
       
-      // Clear error message after 5 seconds
       setTimeout(() => {
         setSubmitMessage('');
       }, 5000);
     });
   };
 
-  // Handle WhatsApp click
   const handleWhatsAppClick = () => {
     window.open('https://wa.me/254729228859?text=Hello%20Lafira%20Tours,%20I%27m%20interested%20in%20your%20services.', '_blank');
   };
 
-  // Handle phone call
   const handlePhoneCall = (number) => {
     window.location.href = `tel:${number}`;
   };
@@ -147,7 +140,6 @@ const Contact = () => {
               </div>
             </InfoItem>
 
-            {/* Business Hours */}
             <div className="business-hours">
               <h4>Business Hours</h4>
               <p>Monday - Friday: 8:00 AM - 8:00 PM</p>

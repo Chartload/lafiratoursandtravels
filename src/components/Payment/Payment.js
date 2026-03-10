@@ -1,6 +1,5 @@
-// src/components/Payment/Payment.js
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { 
   PaymentContainer,
   PaymentWrapper,
@@ -34,7 +33,6 @@ import { FaCcVisa, FaCcMastercard, FaLock, FaArrowLeft, FaCheckCircle } from 're
 
 const Payment = () => {
   const navigate = useNavigate();
-  const params = useParams(); // Fixed: using params instead of unused service
   const [selectedMethod, setSelectedMethod] = useState('visa');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -55,7 +53,6 @@ const Payment = () => {
     const { name, value } = e.target;
     
     if (name === 'cardNumber') {
-      // Format card number with spaces
       const formatted = value
         .replace(/\s/g, '')
         .replace(/(\d{4})/g, '$1 ')
@@ -63,11 +60,9 @@ const Payment = () => {
         .slice(0, 19);
       setFormData({ ...formData, [name]: formatted });
     } else if (name === 'expiryMonth' || name === 'expiryYear') {
-      // Only allow numbers
       const numeric = value.replace(/[^0-9]/g, '').slice(0, 2);
       setFormData({ ...formData, [name]: numeric });
     } else if (name === 'cvv') {
-      // Only allow numbers, max 3 digits
       const numeric = value.replace(/[^0-9]/g, '').slice(0, 3);
       setFormData({ ...formData, [name]: numeric });
     } else {
@@ -104,12 +99,10 @@ const Payment = () => {
     
     setLoading(true);
     
-    // Simulate payment processing
     setTimeout(() => {
       setLoading(false);
       setSuccess(true);
       
-      // Redirect after success
       setTimeout(() => {
         navigate('/');
       }, 3000);
